@@ -14,26 +14,11 @@ from bs4 import BeautifulSoup
 import re
 
 addressPatterns = [
-    #re.compile(r'\b\d{1,5}\s\w+\s\w+\b'),
+    re.compile(r'\b\d{1,5}\s\w+\s\w+\b'),
     #for the google about pattern "https://about.google/contact-google/"
     re.compile(r'\b\d{1,5}\s\w+\s\w+\b.*\b[A-Za-z]{2}\s\d{5}(?:-\d{4})?\b'),
 ]
 
-
-# Function to find and print all addresses in a string
-def print_addresses(text):
-    # Regular expression pattern to match addresses
-
-    #findall finds all matches and returns as a list of strings
-
-    for pattern in addressPatterns:
-        addresses = pattern.findall(text)
-        if addresses:
-            print("Addresses found:")
-            for address in addresses:
-                print("-", address)
-        else:
-            print("No address found with this pattern.")
 
 # Function to scrape a webpage and check for addresses
 def check_website_for_address(url):
@@ -44,28 +29,24 @@ def check_website_for_address(url):
         soup = BeautifulSoup(response.content, 'html.parser')
         # Extract text from HTML and join lines into one
         text = " ".join(line.strip() for line in soup.stripped_strings)
-        # Check if the text contains an address
-        if contains_address(text):
-            print("Address found on the webpage:", url)
-            print_addresses(text)
-        else:
-            print("No address found on the webpage:", url)
+        # Check for address patterns and print addresses if found
+        print_addresses(text)
     else:
         print("Failed to fetch webpage:", url)
 
-
-
-# Function to check if a string contains an address pattern
-def contains_address(text):
-
-    #it goes through all patterns and return true if it finds at least one pattern to match the text
-
+# Function to find and print all addresses in a string
+def print_addresses(text):
+    addresses_found = False
     for pattern in addressPatterns:
-        #re.search() method either returns None (if the pattern doesn’t match), or a re.MatchObject that contains information
-        if pattern.search(text) is not None:
-            return True
-
-    return False
+        print("PATTERN")
+        addresses = pattern.findall(text)
+        if addresses:
+            addresses_found = True
+            print("Addresses found:")
+            for address in addresses:
+                print("-", address)
+    if not addresses_found:
+        print("No address found.")
 
 def readParquetFile(file_path):
     # Open the Parquet file
@@ -102,8 +83,8 @@ if __name__ == '__main__':
     readParquetFile(file_path)
 
     #check_website_for_address("https://www.umbrawindowtinting.com/")
-    #check_website_for_address("https://about.google/contact-google/")
-    check_website_for_address("https://about.google/locations/?region=north-america")
+    check_website_for_address("https://about.google/contact-google/")
+    #check_website_for_address("https://about.google/locations/?region=north-america")
 
 
 
