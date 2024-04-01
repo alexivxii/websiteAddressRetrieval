@@ -57,11 +57,8 @@ addressPatternMap = {
     #COLOMBIA
 
     #Todo: still needs testing
-    #"CO": re.compile(r'\b[a-zA-Z0-9\s#\-áéíóúÁÉÍÓÚ]+,\s*[a-zA-Z\s]+\s*,\s*[a-zA-Z\s]+\b'),
-    #"CO": re.compile(r'\b[a-zA-Z0-9\s#\-áéíóúÁÉÍÓÚ]+,\s*[a-zA-Z\s]+\s*\d{2}\s*-\s*[a-zA-Z\s#áéíóúÁÉÍÓÚ]+\s*,\s*[a-zA-Z\s]+\b'),
-    #"CO": re.compile(r'\b[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]+\s+\d{1,3}[a-zA-Z]*\s+\d{1,3}\s*\d{1,3}\s*[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]+,[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]\b'),
-
-    "CO": re.compile(r'\b(?:Carrera|Calle)\s+\d{1,3}[a-zA-Z]*\s+#?\d{1,3}\s*-\s*\d{1,3}\s*,*[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]+,[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]\b'),
+    #"CO": re.compile(r'\b(?:Carrera|Calle)\s+\d{1,3}[a-zA-Z]*\s+#?\d{1,3}\s*-\s*\d{1,3}\s*,*[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]+,[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]\b'),
+    "CO": re.compile(r'\b\s*[a-zA-Z0-9áéíóúÁÉÍÓÚ.]*\s+\d{1,3}[a-zA-Z]*\s+#?\d{1,3}\s*-\s*\d{1,3}\s*,*[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]+,[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]\b'),
 
     #"USAforum": re.compile(r'^(\d+) ?([A-Za-z](?= ))? (.*?) ([^ ]+?) ?((?<= )APT)? ?((?<= )\d*)?$'),
     # "Romania": re.compile(r'\bStr\.\s+[A-Z][a-z]+\s+\d+(?:[\s,-]+\w+)?(?:,\s+et\.\s*\d+)?(?:,\s+apt\.\s*\d+)?(?:,\s*[1-6])?,?\s+\d{6}\s+[A-Z]+(?:,\s+[A-Z][a-z]+)?\b'),
