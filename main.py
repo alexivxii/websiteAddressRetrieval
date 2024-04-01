@@ -33,7 +33,10 @@ addressPatternMap = {
     #UK
 
     #Todo: still needs testing
-    "UK": re.compile(r'\b(?:[A-Z][a-z]+\s*)+:.*?,\s*[A-Z][a-z]+\s*,\s*[A-Z][a-z]+\b'),
+    #https://londoninreallife.com/living-in-london/london-postcode/
+    #https://www.visitnorthwest.com/liverpool/addresses-postcodes/
+
+    "UK": re.compile(r'\b\d{1,3}\s+[a-zA-Z0-9/\-.]*\s+[a-zA-Z0-9]{1,4}\b\s*[a-zA-Z0-9,]{1,5}\s*\w+\b'),
 
     #/////////////////////////////////////////////////
 
@@ -56,12 +59,8 @@ addressPatternMap = {
 
     #COLOMBIA
 
-    #Todo: still needs testing
     #"CO": re.compile(r'\b(?:Carrera|Calle)\s+\d{1,3}[a-zA-Z]*\s+#?\d{1,3}\s*-\s*\d{1,3}\s*,*[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]+,[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]\b'),
     "CO": re.compile(r'\b\s*[a-zA-Z0-9áéíóúÁÉÍÓÚ.]*\s+\d{1,3}[a-zA-Z]*\s+#?\d{1,3}\s*-\s*\d{1,3}\s*,*[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]+,[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]\b'),
-
-    #"USAforum": re.compile(r'^(\d+) ?([A-Za-z](?= ))? (.*?) ([^ ]+?) ?((?<= )APT)? ?((?<= )\d*)?$'),
-    # "Romania": re.compile(r'\bStr\.\s+[A-Z][a-z]+\s+\d+(?:[\s,-]+\w+)?(?:,\s+et\.\s*\d+)?(?:,\s+apt\.\s*\d+)?(?:,\s*[1-6])?,?\s+\d{6}\s+[A-Z]+(?:,\s+[A-Z][a-z]+)?\b'),
 
 }
 
@@ -99,6 +98,19 @@ colombiaAddressList = [
     "Carrera 5 #8-23, Barranquilla, Atlántico",
     "Calle 10 #12-45, Cali, Valle del Cauca",
     "Carrera 15 #20-10, Bucaramanga, Santander",
+]
+
+ukAddressList = [
+
+    #five guys london addresses
+    #https://restaurants.fiveguys.co.uk/greater-london
+
+    "Baker Street. 194 Baker Street NW1 5RT London",
+    "Bond Street. 92 Wigmore Steet W1U 3RE London",
+    "Brent Cross Deliveroo Editions.Deliveroo Editions, Unit 2 NW2 7LN London",
+    "Brixton. 2 Electric Lane SW9 8FA Brixton",
+    "Camden. 32 Parkway NW1 7AH London",
+    "Canary Wharf.Units 22 / 23 E14 5NY London",
 ]
 
 # Function to scrape a webpage and check for addresses
@@ -147,6 +159,9 @@ def printColombiaAddress():
     for address in colombiaAddressList:
         printAddresses(address, "CO")
 
+def printUKAddress():
+    for address in ukAddressList:
+        printAddresses(address, "UK")
 
 def readParquetFile(file_path):
     # Open the Parquet file
@@ -185,7 +200,6 @@ def checkValidDomain(domain):
         print("Domain Not Valid")
         return False
 
-
 # if the website is valid and registered on the web, then the extension is also a valid one
 def getWebsiteDomainExtension(domain):
     # Regular expression pattern to match the domain extension (. followed by at least two characters and followd by /|\?|$)
@@ -213,7 +227,7 @@ if __name__ == '__main__':
         #Todo: replace testWebsite with for each website in pq file
 
         #testWebsite = pqData.at[0, "domain"]
-        testWebsite = "https://about.google/locations/?region=north-america"
+        testWebsite = "https://restaurants.fiveguys.co.uk/greater-london"
 
         #check if the website domain is valid
         if checkValidDomain(testWebsite):
@@ -242,7 +256,7 @@ if __name__ == '__main__':
                 print(websiteText)
 
                 #printAddresses(websiteText, domainExtension)
-                printAddresses(websiteText, "CO")
+                printAddresses(websiteText, "UK")
 
     #Test websites
     #"https://www.umbrawindowtinting.com/"
@@ -251,9 +265,11 @@ if __name__ == '__main__':
     #"https://about.google/locations/?region=north-america"
     #"https://carrefour.ro/corporate/magazine?p=3"
     #https://www.elespectador.com/
+    #https: // restaurants.fiveguys.co.uk / greater - london
 
     #Test addresses
     #printJapanAddress()
-    printColombiaAddress()
+    #printColombiaAddress()
+    #printUKAddress()
 
 
