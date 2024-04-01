@@ -14,25 +14,50 @@ from bs4 import BeautifulSoup
 import re
 import whois
 
-addressPatterns = [
-    re.compile(r'\b\d{1,5}\s\w+\s\w+\b'),
-    # for the google about pattern "https://about.google/contact-google/"
-    re.compile(r'\b\d{1,5}\s\w+\s\w+\b.*\b[A-Za-z]{2}\s\d{5}(?:-\d{4})?\b'),
-
-]
-
 addressPatternMap = {
-    "RESTWORLD": re.compile(r'\b\d{1,5}\s\w+\s\w+\b.*\b[A-Za-z]{2}\s\d{5}(?:-\d{4})?\b'),
 
-    #"USA2": re.compile(r'\b(?:[A-Z][a-z]+\s*)+,\s*[A-Z][a-z]+\s*,\s*[A-Z]{2}\s*\d{5}(?:-\d{4})?,\s*[A-Z][a-z]+\b'),
+    #USA and rest of the world
+
+    #example address: 2300 Traverwood Dr. Ann Arbor, MI 48105
+    "RESTWORLD": re.compile(r'\b\d+\s+[a-zA-Z0-9\s.,]+?,\s+[a-zA-Z]{2}\s+\d{5,9}\b'),
+
+    #/////////////////////////////////////////////////
+
+    #FRANCE
+
+    #Todo: still needs testing
     "FR": re.compile(r'\b(?:[A-Z][a-z]+\s*)+,.*?,\s*\d{5}\s*[A-Z][a-z]+\b'),
+
+    #/////////////////////////////////////////////////
+
+    #UK
+
+    #Todo: still needs testing
     "UK": re.compile(r'\b(?:[A-Z][a-z]+\s*)+:.*?,\s*[A-Z][a-z]+\s*,\s*[A-Z][a-z]+\b'),
 
+    #/////////////////////////////////////////////////
+
+    #JAPAN
+
     #has prefecture in front
+    #\b for word
+    #(?:東京都|大阪府|福岡県|札幌市|横浜市): This non-capturing group matches any of the specified prefecture names.
+    #\s: Matches a whitespace character after the prefecture name.
+    #\d+: Matches one or more digits.
+    #[A-Z\d-]*: Matches zero or more uppercase letters, digits, or hyphens. This part allows matching apartment or floor numbers like "1F" or "5-6".
+    #[\s,-]+: Matches one or more whitespace characters, commas, or hyphens. This allows handling variations in the address format where spaces, commas, or hyphens are used as separators.
+    #(?:[A-Za-z]+[\s,-]+)+: Non-capturing group that matches one or more occurrences of a word (one or more alphabetic characters) followed by one or more whitespace characters, commas, or hyphens. This part matches street names or districts.
+    #\d{3}-\d{4}: Matches a four-digit postal code separated by a hyphen.
     "JP": re.compile(r'\b(?:東京都|大阪府|福岡県|札幌市|横浜市)?\s*\d+[A-Z\d-]*[\s,-]+(?:[A-Za-z]+[\s,-]+)+\b(?:[A-Za-z]+\s)?\d{3}-\d{4}\b'),
 
-    #Todo: keep -> "JP no optional prefecture in front": re.compile(r'\b\d+[A-Z\d-]*[\s,-]+(?:[A-Za-z]+[\s,-]+)+\d{3}-\d{4}\b'),
-    "CO": re.compile(r'\b\d{1,5}\s\w+\s\w+\b.*\b[A-Za-z]{2}\s\d{5}(?:-\d{4})?\b'),
+    #for JP without the prefecture in front re.compile(r'\b\d+[A-Z\d-]*[\s,-]+(?:[A-Za-z]+[\s,-]+)+\d{3}-\d{4}\b'),
+
+    #/////////////////////////////////////////////////
+
+    #COLOMBIA
+
+    #Todo: still needs testing
+    "CO": re.compile(r'\b[a-zA-Z0-9\s#\-áéíóúÁÉÍÓÚ]+,\s*[a-zA-Z\s]+\s*,\s*[a-zA-Z\s]+\b'),
 
     #"USAforum": re.compile(r'^(\d+) ?([A-Za-z](?= ))? (.*?) ([^ ]+?) ?((?<= )APT)? ?((?<= )\d*)?$'),
     # "Romania": re.compile(r'\bStr\.\s+[A-Z][a-z]+\s+\d+(?:[\s,-]+\w+)?(?:,\s+et\.\s*\d+)?(?:,\s+apt\.\s*\d+)?(?:,\s*[1-6])?,?\s+\d{6}\s+[A-Z]+(?:,\s+[A-Z][a-z]+)?\b'),
@@ -59,6 +84,22 @@ japanAddressList = [
 "2-chōme-19-23 Aobadai Meguro City, Tokyo 153-0042, Japan",
 ]
 
+colombiaAddressList = [
+    #from some commercial centres in bogota
+    "Av. Boyacá #12b-18, Bogotá, Colombia",
+    "Av. Boyacá #80-94, Bogotá, Colombia",
+    "Cl. 94 #11-65, Bogotá, Colombia",
+    "Ac. 26 #62-47, Bogotá, Colombia",
+    "Cra. 71d #6-94, Bogotá, Colombia",
+
+    #from chatgpt
+    "Carrera 7 #32-67, Bogotá, Cundinamarca",
+    "Calle 93 #13-33, Medellín, Antioquia",
+    "Carrera 5 #8-23, Barranquilla, Atlántico",
+    "Calle 10 #12-45, Cali, Valle del Cauca",
+    "Carrera 15 #20-10, Bucaramanga, Santander",
+]
+
 # Function to scrape a webpage and check for addresses
 #if response status code is 200 successful, we return the text inside the html
 #else we return ""
@@ -70,11 +111,12 @@ def checkWebsiteForText(url):
         soup = BeautifulSoup(response.content, 'html.parser')
         # Extract text from HTML and join lines into one, separated by whitespace
         text = " ".join(line.strip() for line in soup.stripped_strings)
+
+        #remove endlines and replace with whitespace
+        text = re.sub(r'\n', ' ', text)
+
         print("Website has text")
         return text
-
-        # Check for address patterns and print addresses if found
-        #print_addresses(text)
     else:
         print("Failed to fetch webpage:", url)
         return ""
@@ -98,7 +140,11 @@ def printAddresses(text,domainExtension):
 
 def printJapanAddress():
     for address in japanAddressList:
-        printAddresses(address, "JPprefecture")
+        printAddresses(address, "JP")
+
+def printColombiaAddress():
+    for address in colombiaAddressList:
+        printAddresses(address, "CO")
 
 
 def readParquetFile(file_path):
@@ -166,7 +212,7 @@ if __name__ == '__main__':
         #Todo: replace testWebsite with for each website in pq file
 
         #testWebsite = pqData.at[0, "domain"]
-        testWebsite = "https://about.google/contact-google/"
+        testWebsite = "https://about.google/locations/?region=north-america"
 
         #check if the website domain is valid
         if checkValidDomain(testWebsite):
@@ -192,14 +238,18 @@ if __name__ == '__main__':
                 # rest of the world usually uses same address format as USA, so we can cover most address formats
                 # apply correct regex pattern for address matching
 
+                print(websiteText)
+
                 printAddresses(websiteText, domainExtension)
-                printJapanAddress()
 
-    # check_website_for_address("https://www.umbrawindowtinting.com/")
-    #check_website_for_address("https://about.google/contact-google/")
-    # check_website_for_address("https://about.google/locations/?region=north-america")
-    # check_website_for_address("https://carrefour.ro/corporate/magazine?p=3")
+    #Test websites
+    #"https://www.umbrawindowtinting.com/"
+    #"https://about.google/contact-google/"
+    #"https://about.google/locations/?region=north-america"
+    #"https://carrefour.ro/corporate/magazine?p=3"
 
+    #Test addresses
     #printJapanAddress()
+    #printColombiaAddress()
 
 
