@@ -57,7 +57,11 @@ addressPatternMap = {
     #COLOMBIA
 
     #Todo: still needs testing
-    "CO": re.compile(r'\b[a-zA-Z0-9\s#\-áéíóúÁÉÍÓÚ]+,\s*[a-zA-Z\s]+\s*,\s*[a-zA-Z\s]+\b'),
+    #"CO": re.compile(r'\b[a-zA-Z0-9\s#\-áéíóúÁÉÍÓÚ]+,\s*[a-zA-Z\s]+\s*,\s*[a-zA-Z\s]+\b'),
+    #"CO": re.compile(r'\b[a-zA-Z0-9\s#\-áéíóúÁÉÍÓÚ]+,\s*[a-zA-Z\s]+\s*\d{2}\s*-\s*[a-zA-Z\s#áéíóúÁÉÍÓÚ]+\s*,\s*[a-zA-Z\s]+\b'),
+    #"CO": re.compile(r'\b[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]+\s+\d{1,3}[a-zA-Z]*\s+\d{1,3}\s*\d{1,3}\s*[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]+,[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]\b'),
+
+    "CO": re.compile(r'\b(?:Carrera|Calle)\s+\d{1,3}[a-zA-Z]*\s+#?\d{1,3}\s*-\s*\d{1,3}\s*,*[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]+,[a-zA-Z0-9\s#áéíóúÁÉÍÓÚ\-]\b'),
 
     #"USAforum": re.compile(r'^(\d+) ?([A-Za-z](?= ))? (.*?) ([^ ]+?) ?((?<= )APT)? ?((?<= )\d*)?$'),
     # "Romania": re.compile(r'\bStr\.\s+[A-Z][a-z]+\s+\d+(?:[\s,-]+\w+)?(?:,\s+et\.\s*\d+)?(?:,\s+apt\.\s*\d+)?(?:,\s*[1-6])?,?\s+\d{6}\s+[A-Z]+(?:,\s+[A-Z][a-z]+)?\b'),
@@ -240,16 +244,19 @@ if __name__ == '__main__':
 
                 print(websiteText)
 
-                printAddresses(websiteText, domainExtension)
+                #printAddresses(websiteText, domainExtension)
+                printAddresses(websiteText, "CO")
 
     #Test websites
     #"https://www.umbrawindowtinting.com/"
     #"https://about.google/contact-google/"
+    #for this website for google locations, beautifulsoup gives a list of all locations and then the locations grouped, thats how the html is made for the website, so some addresses might appear twice
     #"https://about.google/locations/?region=north-america"
     #"https://carrefour.ro/corporate/magazine?p=3"
+    #https://www.elespectador.com/
 
     #Test addresses
     #printJapanAddress()
-    #printColombiaAddress()
+    printColombiaAddress()
 
 
