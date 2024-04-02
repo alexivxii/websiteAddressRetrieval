@@ -19,8 +19,16 @@ addressPatternMap = {
     #USA
 
     #example address: 2300 Traverwood Dr. Ann Arbor, MI 48105
-    "USA": re.compile(r'\b\d+\s+[a-zA-Z0-9\s.,]+?,?\s+[a-zA-Z]{2}\s+\d{4,9}\b'),
-    "CANADA": re.compile(r'\b\d+\s+[a-zA-Z0-9\s.,]+?,?\s+[a-zA-Z]{2}\s+\d{4,9}\b'),
+
+    #USA
+    "COM": re.compile(r'\b\d+\s+[a-zA-Z0-9\s.,]+?,?\s+[a-zA-Z]{2}\s+\d{4,9}\b'),
+    "NET": re.compile(r'\b\d+\s+[a-zA-Z0-9\s.,]+?,?\s+[a-zA-Z]{2}\s+\d{4,9}\b'),
+    "IO": re.compile(r'\b\d+\s+[a-zA-Z0-9\s.,]+?,?\s+[a-zA-Z]{2}\s+\d{4,9}\b'),
+
+    #Canada - same as usa
+    "CA": re.compile(r'\b\d+\s+[a-zA-Z0-9\s.,]+?,?\s+[a-zA-Z]{2}\s+\d{4,9}\b'),
+
+    #google, same as USA
     "GOOGLE": re.compile(r'\b\d+\s+[a-zA-Z0-9\s.,]+?,?\s+[a-zA-Z]{2}\s+\d{4,9}\b'),
 
 
@@ -118,21 +126,28 @@ ukAddressList = [
 #if response status code is 200 successful, we return the text inside the html
 #else we return ""
 def checkWebsiteForText(url):
-    # Fetch the webpage
-    response = requests.get(url)
-    if response.status_code == 200:
-        # Parse HTML content
-        soup = BeautifulSoup(response.content, 'html.parser')
-        # Extract text from HTML and join lines into one, separated by whitespace
-        text = " ".join(line.strip() for line in soup.stripped_strings)
+    try:
+        # Fetch the webpage
+        response = requests.get(url, timeout=10)
+        if response.status_code == 200:
+            # Parse HTML content
+            soup = BeautifulSoup(response.content, 'html.parser')
+            # Extract text from HTML and join lines into one, separated by whitespace
+            text = " ".join(line.strip() for line in soup.stripped_strings)
 
-        #remove endlines and replace with whitespace
-        text = re.sub(r'\n', ' ', text)
+            # remove endlines and replace with whitespace
+            text = re.sub(r'\n', ' ', text)
 
-        print("Website has text")
-        return text
-    else:
-        print("Failed to fetch webpage:", url)
+            print("Website has text")
+            return text
+        else:
+            print("Failed to fetch webpage:", url)
+            return ""
+    except requests.exceptions.Timeout:
+        print("Timeout occurred while fetching webpage:", url)
+        return ""
+    except requests.exceptions.RequestException as e:
+        print("An error occurred while fetching webpage:", e)
         return ""
 
 
@@ -223,40 +238,49 @@ if __name__ == '__main__':
 
     pqData = readParquetFile(file_path)
 
+    #Todo: add function for testing the google page and my chosen domains for testing
+
     #check if we have data in parquet file
     if pqData is not None:
-        #Todo: replace testWebsite with for each website in pq file
 
-        #testWebsite = pqData.at[0, "domain"]
-        testWebsite = "https://about.google/locations/?region=north-america"
+        for index in pqData.index:
 
-        #check if the website domain is valid
-        if checkValidDomain(testWebsite):
+            currWebsite = pqData.at[index, "domain"]
+            print(currWebsite)
 
-            #get text inside website
-            websiteText = checkWebsiteForText(testWebsite)
+            #add protocol and subdomain if not in url from parquet file
+            if "https://www." not in currWebsite:
+                currWebsite = "https://www." + currWebsite
 
-            #check if the website has text inside
-            if websiteText != "":
+            # check if the website domain is valid
+            if checkValidDomain(currWebsite):
 
-                #get website domain extension
-                domainExtension = getWebsiteDomainExtension(testWebsite)
-                print("Domain = " + domainExtension)
+                # get text inside website
+                websiteText = checkWebsiteForText(currWebsite)
 
-                domainExtension = domainExtension.upper()
+                # check if the website has text inside
+                if websiteText != "":
 
-                specialCases = ["USA", "JP", "UK", "CO", "GOOGLE", "CANADA"]
+                    # get website domain extension
+                    domainExtension = getWebsiteDomainExtension(currWebsite)
+                    print("Domain = " + domainExtension)
 
-                if domainExtension not in specialCases:
-                    domainExtension = "FR"
+                    domainExtension = domainExtension.upper()
 
-                # io, net, com websites are usually used for USA websites
-                # rest of the world usually uses same address format as USA, so we can cover most address formats
-                # apply correct regex pattern for address matching
+                    specialCases = ["COM", "JP", "UK", "CO", "GOOGLE", "CA", "NET", "IO"]
 
-                print(websiteText)
+                    if domainExtension not in specialCases:
+                        domainExtension = "FR"
 
-                printAddresses(websiteText, domainExtension)
+                    # io, net, com websites are usually used for USA websites
+                    # apply correct regex pattern for address matching
+
+                    #print(websiteText)
+
+                    printAddresses(websiteText, domainExtension)
+
+
+
 
     #Test websites
     #"https://www.umbrawindowtinting.com/"
