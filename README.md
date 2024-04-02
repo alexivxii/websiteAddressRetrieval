@@ -53,3 +53,6 @@ https://www.starbucksreserve.com/locations/tokyo-roastery
 
 https://pyshark.com/get-domain-name-information-using-python/
 
+https://www.rexegg.com/regex-quickstart.html
+
+https://londoninreallife.com/living-in-london/london-postcode/

@@ -16,23 +16,24 @@ import whois
 
 addressPatternMap = {
 
-    #USA and rest of the world
+    #USA
 
     #example address: 2300 Traverwood Dr. Ann Arbor, MI 48105
-    "RESTWORLD": re.compile(r'\b\d+\s+[a-zA-Z0-9\s.,]+?,\s+[a-zA-Z]{2}\s+\d{5,9}\b'),
+    "USA": re.compile(r'\b\d+\s+[a-zA-Z0-9\s.,]+?,?\s+[a-zA-Z]{2}\s+\d{4,9}\b'),
+    "CANADA": re.compile(r'\b\d+\s+[a-zA-Z0-9\s.,]+?,?\s+[a-zA-Z]{2}\s+\d{4,9}\b'),
+    "GOOGLE": re.compile(r'\b\d+\s+[a-zA-Z0-9\s.,]+?,?\s+[a-zA-Z]{2}\s+\d{4,9}\b'),
+
 
     #/////////////////////////////////////////////////
 
-    #FRANCE
+    #FRANCE and rest of the world
 
-    #Todo: still needs testing
-    "FR": re.compile(r'\b(?:[A-Z][a-z]+\s*)+,.*?,\s*\d{5}\s*[A-Z][a-z]+\b'),
+    "FR": re.compile(r'\b\d{1,3}\s+[a-zA-Z0-9\s.,]+?,?\s+\d{4,9}\s*\w+\b'),
 
     #/////////////////////////////////////////////////
 
     #UK
 
-    #Todo: still needs testing
     #https://londoninreallife.com/living-in-london/london-postcode/
     #https://www.visitnorthwest.com/liverpool/addresses-postcodes/
 
@@ -227,7 +228,7 @@ if __name__ == '__main__':
         #Todo: replace testWebsite with for each website in pq file
 
         #testWebsite = pqData.at[0, "domain"]
-        testWebsite = "https://restaurants.fiveguys.co.uk/greater-london"
+        testWebsite = "https://about.google/locations/?region=north-america"
 
         #check if the website domain is valid
         if checkValidDomain(testWebsite):
@@ -244,10 +245,10 @@ if __name__ == '__main__':
 
                 domainExtension = domainExtension.upper()
 
-                specialCases = ["FR", "JP", "UK", "CO"]
+                specialCases = ["USA", "JP", "UK", "CO", "GOOGLE", "CANADA"]
 
                 if domainExtension not in specialCases:
-                    domainExtension = "RESTWORLD"
+                    domainExtension = "FR"
 
                 # io, net, com websites are usually used for USA websites
                 # rest of the world usually uses same address format as USA, so we can cover most address formats
@@ -255,8 +256,7 @@ if __name__ == '__main__':
 
                 print(websiteText)
 
-                #printAddresses(websiteText, domainExtension)
-                printAddresses(websiteText, "UK")
+                printAddresses(websiteText, domainExtension)
 
     #Test websites
     #"https://www.umbrawindowtinting.com/"
@@ -265,11 +265,13 @@ if __name__ == '__main__':
     #"https://about.google/locations/?region=north-america"
     #"https://carrefour.ro/corporate/magazine?p=3"
     #https://www.elespectador.com/
-    #https: // restaurants.fiveguys.co.uk / greater - london
+    #https://restaurants.fiveguys.co.uk/greater-london
+    #https://restaurants.fiveguys.fr/ile-de-france
 
     #Test addresses
     #printJapanAddress()
     #printColombiaAddress()
     #printUKAddress()
+    #printFRAddress()
 
 
