@@ -36,7 +36,7 @@ Example of the first 5 rows from the parquet file:
 Next I looked online to find out address formats for different countries and special cases.
 The following countries have unique address formats:
 
-USA & CANADA
+USA & CANADA  
 UK  
 JAPAN  
 COLOMBIA  
