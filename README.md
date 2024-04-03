@@ -7,6 +7,15 @@ Write a program that extracts all the valid addresses that are found on a list o
 
 ---
 
+Questions I asked myself:
+
+* How does the input look like?
+* How do i extract text from website?
+* How does the addresses look like? Are there differences?
+* How do i test my code?
+* What happens if there are no addresses/the website doesnt have text/the website is not valid?
+* How do i know which address format pattern to use?
+
 ## My Approach
 
 ### 1. Analyze the input
