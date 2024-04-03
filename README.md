@@ -1,25 +1,114 @@
-        domain
+# Veridion Assignment Documentation
+
+---
+### Challenge #1
+
+Write a program that extracts all the valid addresses that are found on a list of company websites. The format in which you will have to extract this data is the following: country, region, city, postcode, road, and road numbers. 
+
+---
+
+## My Approach
+
+### 1. Analyze the input
+
+Input consists of a parquet file with multiple rows and two columns, first column being the index and the second column being the website domains.
+
+Example of the first 5 rows from the parquet file:
+
+    domain
     0  umbrawindowtinting.com
     1          embcmonroe.org
     2         caffeygroup.com
     3          sk4designs.com
     4      draftingdesign.com
 
-Abordare:
+### 2. Research address formats
 
-Cautare citire fisier parquet
+Next I looked online to find out address formats for different countries and special cases.
+The following countries have unique address formats:
 
-Cautare format adrese utilizand regex
+USA & CANADA
+UK  
+JAPAN  
+COLOMBIA  
+FRANCE  
+REST OF THE WORLD  
 
-Testare cateva regex uri pentru US pe site ul de la google about + offices
+France and Rest of the world have common address formats and can be treated as one.
 
-Gasire tari cu format diferit de adresa
+To identify addresses inside text, i used regex patterns for each country stored in `addressPatternMap`. Key is country website domain and value is the regex pattern.
 
-Testare
+For every use case I found Websites & looked up on Google examples of addresses for testing.  
+Inside the code can be found functions like the ones below, used for testing:
 
-Imbunatatire cod
+`testMyWebsites(testWebsite)` - called in main  
+`printJapanAddress()`  
+`printUKAddress()`  
+`printColombiaAddress()`
 
-Cautare format adresa pentur japonia
+### 3. App flow
+
+Steps for how the app functions (after a lot of testing and trial & error):
+
+1. Read and extract data from the parquet file stored in the environment
+
+
+2. For every item in the pq file check if the domain is valid.  
+
+First, some websites do not have the protocol and subdomain so we have to check and add them if needed.  
+Use `checkValidDomain(domain)`. Inside this function I use whois package which checks if a website domain is valid.  
+
+3. Check if the website has text and store it inside `websiteText` variable
+
+Function `checkWebsiteForText(url)` is used and works like this:
+
+* tries to connect to the website using `requests` package
+* using `BeautifulSoup` package i extract the html inside the website. After that, i join all the lines together and remove endlines & replace them with whitespace. The reason is that the regex pattern need one long line of text to correctly identify address patterns.
+* if an error occurs, the exception will be printed and return blank string
+    
+4. If current website has text, we need to apply regex patterns.
+
+In order to use the correct pattern, I need to know the country of the website (for better narrowing of correct address pattern).  
+I use function `getWebsiteDomainExtension(domain)` to extract the domain of the url using a regex pattern and return it.  
+If the domain function is inside the special cases below, we use the corresponding regex.
+`specialCases = ["COM", "JP", "UK", "CO", "GOOGLE", "CA", "NET", "IO"]` - where COM, CA, NET, IO have the same pattern for USA address format.  
+Otherwise, we use address format for France.
+
+Using `printAddresses(text,domainExtension)` I apply the pattern and print addresses in console. If no address can be found inside our text, a message is printed in console.
+
+### 4. Python requirements
+
+Modules installed in my environment and versions
+
+    beautifulsoup4     4.12.3
+    certifi            2024.2.2
+    charset-normalizer 3.3.2
+    idna               3.6
+    numpy              1.26.4
+    pandas             2.2.1
+    pip                22.3.1
+    pyarrow            15.0.2
+    python-dateutil    2.9.0.post0
+    python-whois       0.9.3
+    pytz               2024.1
+    requests           2.31.0
+    setuptools         65.5.1
+    six                1.16.0
+    soupsieve          2.5
+    tzdata             2024.1
+    urllib3            2.2.1
+    wheel              0.38.4
+
+Modules imported
+
+    import pyarrow.parquet as pq
+    import pandas
+    import requests
+    from bs4 import BeautifulSoup
+    import re
+    import whois
+
+### 5. Bibliography
 
 https://about.google/contact-google/
 

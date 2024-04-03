@@ -1,10 +1,3 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-# pip install pyarrow for parquet file read, version
-# Successfully installed numpy-1.26.4 pyarrow-15.0.2
 
 
 import pyarrow.parquet as pq
@@ -179,6 +172,37 @@ def printUKAddress():
     for address in ukAddressList:
         printAddresses(address, "UK")
 
+def testMyWebsites(testWebsite):
+
+
+    # check if the website domain is valid
+    if checkValidDomain(testWebsite):
+
+        # get text inside website
+        websiteText = checkWebsiteForText(testWebsite)
+
+        # check if the website has text inside
+        if websiteText != "":
+
+            # get website domain extension
+            domainExtension = getWebsiteDomainExtension(testWebsite)
+            print("Domain = " + domainExtension)
+
+            domainExtension = domainExtension.upper()
+
+            specialCases = ["COM", "JP", "UK", "CO", "GOOGLE", "CA", "NET", "IO"]
+
+            if domainExtension not in specialCases:
+                domainExtension = "FR"
+
+            # io, net, com websites are usually used for USA websites
+            # apply correct regex pattern for address matching
+
+            # print(websiteText)
+
+            printAddresses(websiteText, domainExtension)
+
+
 def readParquetFile(file_path):
     # Open the Parquet file
     parquet_file = pq.ParquetFile(file_path)
@@ -233,6 +257,9 @@ def getWebsiteDomainExtension(domain):
 
 
 if __name__ == '__main__':
+
+    testMyWebsites("https://about.google/locations/?region=north-america")
+
     # Specify the path to your Parquet file
     file_path = "list of company websites.snappy.parquet"
 
@@ -280,20 +307,19 @@ if __name__ == '__main__':
                     printAddresses(websiteText, domainExtension)
 
 
-
+    else:
+        print("Parquet file is empty")
 
     #Test websites
     #"https://www.umbrawindowtinting.com/"
     #"https://about.google/contact-google/"
     #for this website for google locations, beautifulsoup gives a list of all locations and then the locations grouped, thats how the html is made for the website, so some addresses might appear twice
     #"https://about.google/locations/?region=north-america"
-    #"https://carrefour.ro/corporate/magazine?p=3"
-    #https://www.elespectador.com/
     #https://restaurants.fiveguys.co.uk/greater-london
     #https://restaurants.fiveguys.fr/ile-de-france
 
     #Test addresses
-    #printJapanAddress()
+    #printJapanAddress()s
     #printColombiaAddress()
     #printUKAddress()
     #printFRAddress()
